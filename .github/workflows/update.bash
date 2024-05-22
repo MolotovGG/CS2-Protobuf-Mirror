@@ -6,7 +6,7 @@ current_version=$(cat ./hash.txt)
 echo "Current Version: ${current_version}"
 echo "Latest Version: ${latest_version}"
 
-if [latest_version <> current_version ] then
+if [latest_version <> current_version ]; then
     echo "Updating..."
 
     mkdir working/
