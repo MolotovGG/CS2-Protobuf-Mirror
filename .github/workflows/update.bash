@@ -15,10 +15,10 @@ if [ "$latest_version" != "$current_version" ]; then
 
     rm -rf ./protobufs/
     mkdir ./protobufs/
-    cp ./working/repo/Protobufs/* ./protobufs/
+    cp ./working/repo/GameTracking-CS2-master/Protobufs/* ./protobufs/
 
-    cat ./working/repo/game/csgo/steam.inf > ./steam.inf
-    echo latest_version > ./hash.txt
+    cat ./working/repo/GameTracking-CS2-master/game/csgo/steam.inf > ./steam.inf
+    echo "${latest_version}" > ./hash.txt
 
     rm -rf ./working/
 
