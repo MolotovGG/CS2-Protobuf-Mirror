@@ -1,8 +1,7 @@
 name: Check/Fetch Protobufs
-run-name: ${{ github.actor }} is learning GitHub Actions
 on: [push, workflow_dispatch]
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello World"
+      - run: bash ./update.bash
