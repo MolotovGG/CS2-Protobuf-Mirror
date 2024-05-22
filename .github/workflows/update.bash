@@ -10,7 +10,7 @@ if [ "$latest_version" != "$current_version" ]; then
     echo "Updating..."
 
     mkdir working/
-    curl https://codeload.github.com/SteamDatabase/GameTracking-CS2/zip/refs/heads/master -O ./working/repo.zip
+    curl https://codeload.github.com/SteamDatabase/GameTracking-CS2/zip/refs/heads/master -o ./working/repo.zip
     unzip ./working/repo.zip -d ./repo/
 
     rm -rf ./protobufs/
