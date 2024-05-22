@@ -4,4 +4,5 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - run: bash ./.github/workflows/update.bash
+      - run: ls /bin/
+      - run: /bin/bash ./.github/workflows/update.bash
