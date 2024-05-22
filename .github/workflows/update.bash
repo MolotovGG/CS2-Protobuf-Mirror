@@ -21,12 +21,10 @@ if [ "$latest_version" != "$current_version" ]; then
     echo "${latest_version}" > ./hash.txt
 
     rm -rf ./working/
-
-
     
     git config user.email "bot@samh.dev"
     git config user.name "Updater"
     git add -A
-    git commit -m "Update Mirror to ${latest_version}"
+    git commit -m "Update Mirror to ${latest_version:0:12}"
     git push
 fi
