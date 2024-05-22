@@ -1,7 +1,7 @@
 #!/bin/bash
 
-latest_version = $(curl https://api.github.com/repos/SteamDatabase/GameTracking-CS2/commits/master | jq ".sha" -r)
-current_version = $(cat ./hash.txt)
+latest_version=$(curl https://api.github.com/repos/SteamDatabase/GameTracking-CS2/commits/master | jq ".sha" -r)
+current_version=$(cat ./hash.txt)
 
 echo "Current Version: ${current_version}"
 echo "Latest Version: ${latest_version}"
