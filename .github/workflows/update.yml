@@ -1,8 +1,8 @@
 name: Check/Fetch Protobufs
 on: 
-  workflow_dispatch:
   schedule:
     - cron: "42 0/4 * * *" 
+  workflow_dispatch:
 jobs:
   fetch:
     runs-on: ubuntu-latest
