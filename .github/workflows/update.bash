@@ -22,10 +22,11 @@ if [ "$latest_version" != "$current_version" ]; then
 
     rm -rf ./working/
 
+
+    
+    git config user.email "bot@samh.dev"
+    git config user.name "Updater"
     git add -A
     git commit -m "Update Mirror to ${latest_version}"
     git push
-
-    git config user.email "bot@samh.dev"
-    git config user.name "Updater"
 fi
