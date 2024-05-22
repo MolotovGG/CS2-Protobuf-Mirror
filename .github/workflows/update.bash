@@ -11,7 +11,7 @@ if [ "$latest_version" != "$current_version" ]; then
 
     mkdir working/
     curl https://codeload.github.com/SteamDatabase/GameTracking-CS2/zip/refs/heads/master -o ./working/repo.zip
-    unzip ./working/repo.zip -d ./repo/
+    unzip ./working/repo.zip -d ./working/repo/
 
     rm -rf ./protobufs/
     mkdir ./protobufs/
