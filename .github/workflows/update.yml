@@ -5,8 +5,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.5
-      - run: ls /bin/
-      - run: pwd
-      - run: ls
       - run: chmod +x ./.github/workflows/update.bash
       - run: ./.github/workflows/update.bash
