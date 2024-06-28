@@ -6,7 +6,9 @@ current_version=$(cat ./hash.txt)
 echo "Current Version: ${current_version}"
 echo "Latest Version: ${latest_version}"
 
-if [ "$latest_version" != "$current_version" ]; then
+if [ "$latest_version" = "null" ]; then
+    echo "Null Update Version; Skipping..."
+elif [ "$latest_version" != "$current_version" ]; then
     echo "Updating..."
 
     mkdir working/
@@ -27,4 +29,8 @@ if [ "$latest_version" != "$current_version" ]; then
     git add -A
     git commit -m "Update Mirror to ${latest_version:0:12}"
     git push
+
+    echo "Update Finished; Via La Loca"
+else
+    echo "No Work; Goodbye"
 fi
