@@ -25,7 +25,7 @@ elif [ "$latest_version" != "$current_version" ]; then
     rm -rf ./working/
     
     git config user.email "bot@samh.dev"
-    git config user.name "Updater"
+    git config user.name "Bot Cliffe"
     git add -A
     git commit -m "Update Mirror to ${latest_version:0:12}"
     git push
