@@ -25,7 +25,7 @@ jobs:
               printf "Tracked SHA: $TRACKED_COMMIT"
               printf "tracked_commit=$TRACKED_COMMIT\n" >> "$GITHUB_OUTPUT"
           else
-             printf "Tracked SHA: IS NULL?"
+             printf "Tracked SHA: IS NULL? (${TRACKED_COMMIT_BASE64})"
              printf "tracked_commit=null\n" >> "$GITHUB_OUTPUT"
           fi
   update-tracking:
@@ -35,7 +35,7 @@ jobs:
     outputs:
         protobuf-updated: ${{ steps.check_protobuf.outputs.protobuf-updated }}
     env:
-       latest_version: ${{ needs.pull-hashes.outputs.tracked_commit }}
+       latest_version: ${{ steps.remote_commit.outputs.remote_commit }}
     permissions:
       contents: write
     steps:
