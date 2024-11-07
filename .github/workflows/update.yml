@@ -20,7 +20,7 @@ jobs:
         id: tracked_commit
         run: |
           TRACKED_COMMIT_BASE64=$(curl https://api.github.com/repos/MolotovGG/CS2-Protobuf-Mirror/contents/hash.txt?ref=tracking | jq ".content" -r)
-          if [ TRACKED_COMMIT_BASE64 == "null"]
+          if [ TRACKED_COMMIT_BASE64 == "null"]; then
               TRACKED_COMMIT=$(printf "${TRACKED_COMMIT_BASE64}" | base64 -d)
               printf "Tracked SHA: $TRACKED_COMMIT"
               printf "tracked_commit=$TRACKED_COMMIT\n" >> "$GITHUB_OUTPUT"
