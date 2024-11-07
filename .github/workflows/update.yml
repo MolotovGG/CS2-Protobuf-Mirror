@@ -23,7 +23,7 @@ jobs:
   update-tracking:
     runs-on: ubuntu-latest
     needs: [check-for-update]
-    if: ${{ steps.pull-hashes.outputs.remote-commit }} <> ${{ steps.pull-hashes.outputs.tracked-commit }}
+    if: (${{ steps.pull-hashes.outputs.remote-commit }} != ${{ steps.pull-hashes.outputs.tracked-commit }}) && (${{ steps.pull-hashes.outputs.remote-commit }} != "null")
     steps:
       - name: Pull!
         run: printf "should pull here"
