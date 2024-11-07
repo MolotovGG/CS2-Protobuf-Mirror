@@ -7,25 +7,35 @@ jobs:
   pull-hashes:
     runs-on: ubuntu-latest
     outputs:
-      remote-commit: ${{ steps.pull-hashes.outputs.remote-commit }}
-      tracked-commit: ${{ steps.pull-hashes.outputs.tracked-commit }}
+      remote_commit: ${{ steps.remote_commit.outputs.remote_commit }}
+      tracked_commit: ${{ steps.tracked_commit.outputs.tracked_commit }}
     steps:
       - name: Get Remote Commit
+        id: remote_commit
         run: |
           REMOTE_COMMIT=$(curl https://api.github.com/repos/SteamDatabase/GameTracking-CS2/commits/master | jq ".sha" -r)
           printf "Remote SHA: $REMOTE_COMMIT"
-          printf "remote-commit=$REMOTE_COMMIT\n" >> "$GITHUB_OUTPUT"
+          printf "remote_commit=$REMOTE_COMMIT\n" >> "$GITHUB_OUTPUT"
       - name: Get Tracked Commit
+        id: tracked_commit
         run: |
-          TRACKED_COMMENT=$(curl https://api.github.com/repos/MolotovGG/CS2-Protobuf-Mirror/contents/hash.txt?ref=tracking | jq ".content" -r | base64 -d)
-          printf "Tracked SHA: $TRACKED_COMMENT"
-          printf "remote-commit=$TRACKED_COMMENT\n" >> "$GITHUB_OUTPUT"
+          TRACKED_COMMIT_BASE64=$(curl https://api.github.com/repos/MolotovGG/CS2-Protobuf-Mirror/contents/hash.txt?ref=tracking | jq ".content" -r)
+          if [ TRACKED_COMMIT_BASE64 == "null"]
+              TRACKED_COMMIT=$(printf "${TRACKED_COMMIT_BASE64}" | base64 -d)
+              printf "Tracked SHA: $TRACKED_COMMIT"
+              printf "tracked_commit=$TRACKED_COMMIT\n" >> "$GITHUB_OUTPUT"
+          else
+             printf "Tracked SHA: IS NULL?"
+             printf "tracked_commit=null\n" >> "$GITHUB_OUTPUT"
+          fi
   update-tracking:
     runs-on: ubuntu-latest
     needs: [pull-hashes]
-    if: ${{ (steps.pull-hashes.outputs.remote-commit != steps.pull-hashes.outputs.tracked-commit) && (steps.pull-hashes.outputs.remote-commit != "null") }} 
+    if: "${{ (needs.pull-hashes.outputs.remote_commit != needs.pull-hashes.outputs.tracked_commit) && (needs.pull-hashes.outputs.remote_commit != 'null') }}"
     outputs:
-      protobuf-updated: ${{ steps.update-tracking.outputs.protobuf-updated }}
+        protobuf-updated: ${{ steps.check_protobuf.outputs.protobuf-updated }}
+    env:
+       latest_version: ${{ needs.pull-hashes.outputs.tracked_commit }}
     steps:
       - name: Pull Remote
         run: |
@@ -39,30 +49,30 @@ jobs:
           ref: "tracking"
       - name: Write Protobufs
         run: |
-          rm -rf ./protobufs/
-          mkdir ./protobufs/
-          cp ./working/repo/GameTracking-CS2-master/Protobufs/* ./protobufs/
+            rm -rf ./protobufs/
+            mkdir ./protobufs/
+            cp ./working/repo/GameTracking-CS2-master/Protobufs/* ./protobufs/
       - name: Write Metadata
         run: |
-          latest_version=${{ steps.pull-hashes.outputs.remote-commit }}
-          cat ./working/repo/GameTracking-CS2-master/game/csgo/steam.inf > ./steam.inf
-          printf "${latest_version}" > ./hash.txt
+            cat ./working/repo/GameTracking-CS2-master/game/csgo/steam.inf > ./steam.inf
+            printf "${latest_version}" > ./hash.txt
       - name: Commit
         run: |
-          latest_version=${{ steps.pull-hashes.outputs.remote-commit }}
-          git config user.email "bot@samh.dev"
-          git config user.name "Synchronise"
-          git add -A
-          git commit -m "Update Mirror to ${latest_version:0:12}"
-          git push
+            git config user.email "bot@samh.dev"
+            git config user.name "Synchronise"
+            git add -A
+            git commit -m "Update Mirror to ${latest_version:0:12}"
+            git push
       - name: Check Protobuf Changes
+        id: check_protobuf
         run: |
-          DIFF=$(git --no-pager diff --name-only HEAD HEAD~1 -- ./a/)
-          if [ -n "$DIFF" ]; then
-              printf "Protobufs have changed"
-              printf "protobuf-updated=1\n" >> "$GITHUB_OUTPUT"
-          else
-              printf "Protobufs haven't changed"
-              printf "protobuf-updated=0\n" >> "$GITHUB_OUTPUT"
-          fi
+            DIFF=$(git --no-pager diff --name-only HEAD HEAD~1 -- ./a/)
+            if [ -n "$DIFF" ]; then
+                printf "Protobufs have changed"
+                printf "protobuf-updated=1\n" >> "$GITHUB_OUTPUT"
+            else
+                printf "Protobufs haven't changed"
+                printf "protobuf-updated=0\n" >> "$GITHUB_OUTPUT"
+            fi
+    
       
