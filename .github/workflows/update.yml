@@ -37,16 +37,16 @@ jobs:
     env:
        latest_version: ${{ needs.pull-hashes.outputs.tracked_commit }}
     steps:
+      - name: Checkout Tracking
+        uses: actions/checkout@v4.2.2
+        with:
+          ref: "tracking"
       - name: Pull Remote
         run: |
             mkdir working/
             curl https://codeload.github.com/SteamDatabase/GameTracking-CS2/zip/refs/heads/master -o ./working/repo.zip
       - name: Extract Remote
         run:  unzip ./working/repo.zip -d ./working/repo/
-      - name: Checkout Tracking
-        uses: actions/checkout@v4.2.2
-        with:
-          ref: "tracking"
       - name: Write Protobufs
         run: |
             rm -rf ./protobufs/
@@ -56,6 +56,8 @@ jobs:
         run: |
             cat ./working/repo/GameTracking-CS2-master/game/csgo/steam.inf > ./steam.inf
             printf "${latest_version}" > ./hash.txt
+      - name: Cleanup Working
+        run: rm -rf ./working/
       - name: Commit
         run: |
             git config user.email "bot@samh.dev"
