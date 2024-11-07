@@ -4,7 +4,7 @@ on:
     - cron: "42 0/4 * * *" 
   workflow_dispatch:
 jobs:
-  check-for-update:
+  pull-hashes:
     runs-on: ubuntu-latest
     outputs:
       remote-commit: ${{ steps.pull-hashes.outputs.remote-commit }}
@@ -22,8 +22,47 @@ jobs:
           printf "remote-commit=$TRACKED_COMMENT\n" >> "$GITHUB_OUTPUT"
   update-tracking:
     runs-on: ubuntu-latest
-    needs: [check-for-update]
-    if: (${{ steps.pull-hashes.outputs.remote-commit }} != ${{ steps.pull-hashes.outputs.tracked-commit }}) && (${{ steps.pull-hashes.outputs.remote-commit }} != "null")
+    needs: [pull-hashes]
+    if: ${{ (steps.pull-hashes.outputs.remote-commit != steps.pull-hashes.outputs.tracked-commit) && (steps.pull-hashes.outputs.remote-commit != "null") }} 
+    outputs:
+      protobuf-updated: ${{ steps.update-tracking.outputs.protobuf-updated }}
     steps:
-      - name: Pull!
-        run: printf "should pull here"
+      - name: Pull Remote
+        run: |
+            mkdir working/
+            curl https://codeload.github.com/SteamDatabase/GameTracking-CS2/zip/refs/heads/master -o ./working/repo.zip
+      - name: Extract Remote
+        run:  unzip ./working/repo.zip -d ./working/repo/
+      - name: Checkout Tracking
+        uses: actions/checkout@v4.2.2
+        with:
+          ref: "tracking"
+      - name: Write Protobufs
+        run: |
+          rm -rf ./protobufs/
+          mkdir ./protobufs/
+          cp ./working/repo/GameTracking-CS2-master/Protobufs/* ./protobufs/
+      - name: Write Metadata
+        run: |
+          latest_version=${{ steps.pull-hashes.outputs.remote-commit }}
+          cat ./working/repo/GameTracking-CS2-master/game/csgo/steam.inf > ./steam.inf
+          printf "${latest_version}" > ./hash.txt
+      - name: Commit
+        run: |
+          latest_version=${{ steps.pull-hashes.outputs.remote-commit }}
+          git config user.email "bot@samh.dev"
+          git config user.name "Synchronise"
+          git add -A
+          git commit -m "Update Mirror to ${latest_version:0:12}"
+          git push
+      - name: Check Protobuf Changes
+        run: |
+          DIFF=$(git --no-pager diff --name-only HEAD HEAD~1 -- ./a/)
+          if [ -n "$DIFF" ]; then
+              printf "Protobufs have changed"
+              printf "protobuf-updated=1\n" >> "$GITHUB_OUTPUT"
+          else
+              printf "Protobufs haven't changed"
+              printf "protobuf-updated=0\n" >> "$GITHUB_OUTPUT"
+          fi
+      
