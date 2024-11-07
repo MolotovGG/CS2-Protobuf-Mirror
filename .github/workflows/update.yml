@@ -1,10 +1,10 @@
-name: Check/Fetch Protobufs
+name: Synchronise
 on: 
   schedule:
     - cron: "42 0/4 * * *" 
   workflow_dispatch:
 jobs:
-  pull-hashes:
+  check-for-update:
     runs-on: ubuntu-latest
     outputs:
       remote-commit: ${{ steps.pull-hashes.outputs.remote-commit }}
@@ -13,8 +13,17 @@ jobs:
       - name: Get Remote Commit
         run: |
           REMOTE_COMMIT=$(curl https://api.github.com/repos/SteamDatabase/GameTracking-CS2/commits/master | jq ".sha" -r)
+          printf "Remote SHA: $REMOTE_COMMIT"
           printf "remote-commit=$REMOTE_COMMIT\n" >> "$GITHUB_OUTPUT"
       - name: Get Tracked Commit
         run: |
           TRACKED_COMMENT=$(curl https://api.github.com/repos/MolotovGG/CS2-Protobuf-Mirror/contents/hash.txt?ref=tracking | jq ".content" -r | base64 -d)
+          printf "Tracked SHA: $TRACKED_COMMENT"
           printf "remote-commit=$TRACKED_COMMENT\n" >> "$GITHUB_OUTPUT"
+  update-tracking:
+    runs-on: ubuntu-latest
+    needs: [check-for-update]
+    if: ${{ steps.pull-hashes.outputs.remote-commit }} <> ${{ steps.pull-hashes.outputs.tracked-commit }}
+    steps:
+      - name: Pull!
+        run: printf "should pull here"
