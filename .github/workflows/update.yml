@@ -21,12 +21,12 @@ jobs:
         run: |
           TRACKED_COMMIT_BASE64=$(curl https://api.github.com/repos/MolotovGG/CS2-Protobuf-Mirror/contents/hash.txt?ref=tracking | jq ".content" -r)
           if [[ TRACKED_COMMIT_BASE64 == "null" ]]; then
+              printf "Tracked SHA: IS NULL? (${TRACKED_COMMIT_BASE64})"
+              printf "tracked_commit=null\n" >> "$GITHUB_OUTPUT"
+          else
               TRACKED_COMMIT=$(printf "${TRACKED_COMMIT_BASE64}" | base64 -d)
               printf "Tracked SHA: $TRACKED_COMMIT"
               printf "tracked_commit=$TRACKED_COMMIT\n" >> "$GITHUB_OUTPUT"
-          else
-             printf "Tracked SHA: IS NULL? (${TRACKED_COMMIT_BASE64})"
-             printf "tracked_commit=null\n" >> "$GITHUB_OUTPUT"
           fi
   update-tracking:
     runs-on: ubuntu-latest
@@ -70,7 +70,7 @@ jobs:
       - name: Check Protobuf Changes
         id: check_protobuf
         run: |
-            DIFF=$(git --no-pager diff --name-only HEAD HEAD~1 -- ./a/)
+            DIFF=$(git --no-pager diff --name-only HEAD HEAD~1 -- ./protobufs/)
             if [ -n "$DIFF" ]; then
                 printf "Protobufs have changed"
                 printf "protobuf-updated=1\n" >> "$GITHUB_OUTPUT"
