@@ -4,11 +4,17 @@ on:
     - cron: "42 0/4 * * *" 
   workflow_dispatch:
 jobs:
-  fetch:
+  pull-hashes:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      remote-commit: ${{ steps.pull-hashes.outputs.remote-commit }}
+      tracked-commit: ${{ steps.pull-hashes.outputs.tracked-commit }}
     steps:
-      - uses: actions/checkout@v4.1.5
-      - run: chmod +x ./.github/workflows/update.bash
-      - run: ./.github/workflows/update.bash
+      - name: Get Remote Commit
+        run: |
+          REMOTE_COMMIT=$(curl https://api.github.com/repos/SteamDatabase/GameTracking-CS2/commits/master | jq ".sha" -r)
+          printf "remote-commit=$REMOTE_COMMIT\n" >> "$GITHUB_OUTPUT"
+      - name: Get Tracked Commit
+        run: |
+          TRACKED_COMMENT=$(curl https://api.github.com/repos/MolotovGG/CS2-Protobuf-Mirror/contents/hash.txt?ref=tracking | jq ".content" -r | base64 -d)
+          printf "remote-commit=$TRACKED_COMMENT\n" >> "$GITHUB_OUTPUT"
