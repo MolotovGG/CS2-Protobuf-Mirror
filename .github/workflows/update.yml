@@ -87,7 +87,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout Tracking
+      - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
           ref: "main"
@@ -95,6 +95,23 @@ jobs:
         run: |
             git config user.email "bot@samh.dev"
             git config user.name "Synchronise"
-            git merge tracking -v -m "Update Mirror to ${latest_version:0:12}"  -s theirs
+            git merge tracking -v -m "Update Mirror to ${latest_version:0:12}"
       - name: Push
         run: git push
+        
+  send-webhook:
+    runs-on: ubuntu-latest
+    needs: [pull-hashes, update-main]
+    env:
+       latest_version: ${{ needs.pull-hashes.outputs.remote_commit }}
+       webhook_path: ${{ secrets.WEBHOOK_PATH }}
+    steps:
+      - name: send-webhook
+        run: |
+          DIFF="$(git --no-pager diff --stat HEAD~1 HEAD)"
+          THIS_COMMIT="$(git rev-parse HEAD)"
+          TRACKED_HASH_SHORT="${latest_version:0:12}"
+          CS_VERSION="$(cat steam.inf | grep 'PatchVersion=' | sed -Ee 's/.+=//g'^C)"
+          REQ="{\"content\":null,\"embeds\":[{\"title\":\"Protobuf Mirror Update\",\"description\":\"```\n${DIFF}\n```\n[View on Github](https://github.com/MolotovGG/CS2-Protobuf-Mirror/commit/${THIS_COMMIT})\",\"color\":5831847,\"fields\":[{\"name\":\"Hash\",\"value\":\"${TRACKED_HASH_SHORT}\",\"inline\":true},{\"name\":\"CS2 Version\",\"value\":\"${CS_VERSION}\",\"inline\":true}],\"author\":{\"name\":\"MolotovGG/CS2-Protobuf-Mirror\",\"url\":\"https://github.com/MolotovGG/CS2-Protobuf-Mirror\",\"icon_url\":\"https://avatars.githubusercontent.com/in/15368\"}}],\"username\":\"Protobot\",\"avatar_url\":\"https://365randommuppets.wordpress.com/wp-content/uploads/2014/03/094-80s-robot.jpg?w=1200\",\"attachments\":[]}"
+          URL="https://discord.com/api/webhooks/${webhook_path}?wait=true"
+          curl -H "Content-Type: application/json" -d "$REQ" "$URL" -v
