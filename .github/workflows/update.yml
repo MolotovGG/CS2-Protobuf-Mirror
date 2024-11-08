@@ -95,12 +95,12 @@ jobs:
         run: |
           git fetch --all -v
           git checkout tracking
-          git checkout master
+          git checkout main
       - name: Merge Tracking
         run: |
             git config user.email "bot@samh.dev"
             git config user.name "Synchronise"
-            git merge tracking -v -m "Update Mirror to ${latest_version:0:12}"
+            git merge tracking -v -m "Update Mirror to ${latest_version:0:12}" --squash
       - name: Push
         run: git push
         
