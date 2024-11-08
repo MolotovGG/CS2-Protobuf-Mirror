@@ -102,7 +102,10 @@ jobs:
             git config user.name "Synchronise"
             git merge tracking -v -m "Update Mirror to ${latest_version:0:12}" --squash
       - name: Push
-        run: git push
+        run: |
+          git add -A 
+          git commit -m "Update Mirror to ${latest_version:0:12}
+          git push
         
   send-webhook:
     runs-on: ubuntu-latest
@@ -111,6 +114,8 @@ jobs:
        latest_version: ${{ needs.pull-hashes.outputs.remote_commit }}
        webhook_path: ${{ secrets.WEBHOOK_PATH }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
       - name: send-webhook
         run: |
           DIFF="$(git --no-pager diff --stat HEAD~1 HEAD)"
