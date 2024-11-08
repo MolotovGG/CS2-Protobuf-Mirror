@@ -104,7 +104,7 @@ jobs:
       - name: Push
         run: |
           git add -A 
-          git commit -m "Update Mirror to ${latest_version:0:12}
+          git commit -m "Update Mirror to ${latest_version:0:12}"
           git push
         
   send-webhook:
