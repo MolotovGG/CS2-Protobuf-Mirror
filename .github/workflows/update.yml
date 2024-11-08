@@ -70,7 +70,7 @@ jobs:
       - name: Check Protobuf Changes
         id: check_protobuf
         run: |
-            DIFF=$(git --no-pager diff --name-only HEAD HEAD~1 -- ./protobufs/)
+            DIFF=$(git --no-pager diff --name-only HEAD~1 HEAD -- ./protobufs/)
             if [ -n "$DIFF" ]; then
                 printf "Protobufs have changed"
                 printf "protobuf-updated=1\n" >> "$GITHUB_OUTPUT"
@@ -116,9 +116,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          depth: 3
       - name: send-webhook
         run: |
-          DIFF="$(git --no-pager diff --stat HEAD~1 HEAD)"
+          DIFF="$(git --no-pager diff --stat HEAD~1 HEAD -- ./protobufs/)"
           THIS_COMMIT="$(git rev-parse HEAD)"
           TRACKED_HASH_SHORT="${latest_version:0:12}"
           CS_VERSION="$(cat steam.inf | grep 'PatchVersion=' | sed -Ee 's/.+=//g'^C)"
