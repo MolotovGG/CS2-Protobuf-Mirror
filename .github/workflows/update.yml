@@ -117,7 +117,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
-          depth: 3
+          fetch-depth: 3
       - name: send-webhook
         run: |
           DIFF="$(git --no-pager diff --stat HEAD~1 HEAD -- ./protobufs/)"
