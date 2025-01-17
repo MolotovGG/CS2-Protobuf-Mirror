@@ -90,23 +90,29 @@ jobs:
       - name: Checkout Main
         uses: actions/checkout@v4.2.2
         with:
+          path: 'main'
           ref: "main"
-      - name: Fetch Tracking
+      - name: Checkout Tracking
+        uses: actions/checkout@4.2.2
+        with: 
+          path: "tracking"
+          ref: "tracking"
+      - name: Copy Changes
         run: |
-          git fetch --all -v
-          git checkout tracking
+          rm -rf ./main/protobufs
+          cp ./tracking/protobuf/ ./main/protobuf
+          cp ./tracking/steam.inf ./main/steam.inf
+          cp ./tracking/hash.txt ./main/hash.txt
           git checkout main
-      - name: Merge Tracking
+      - name: Create Commit
         run: |
+            cp main
             git config user.email "bot@samh.dev"
             git config user.name "Synchronise"
-            git merge tracking -v -m "Update Mirror to ${latest_version:0:12}" --squash
-      - name: Push
-        run: |
-          git add -A 
-          git commit -m "Update Mirror to ${latest_version:0:12}"
-          git push
-        
+            git add -A 
+            git commit -m "Update Mirror to ${latest_version:0:12}"
+            git push
+      
   send-webhook:
     runs-on: ubuntu-latest
     needs: [pull-hashes, update-main]
