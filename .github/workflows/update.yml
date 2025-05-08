@@ -100,7 +100,9 @@ jobs:
       - name: Copy Changes
         run: |
           rm -rf ./main/protobufs
-          cp ./tracking/protobufs/ ./main/protobufs
+          rm ./main/steam.inf
+          rm ./main/hash.txt
+          cp -r ./tracking/protobufs/ ./main/protobufs
           cp ./tracking/steam.inf ./main/steam.inf
           cp ./tracking/hash.txt ./main/hash.txt
           git checkout main
