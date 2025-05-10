@@ -27,10 +27,9 @@ jobs:
           cp -r ./tracking/protobufs/ ./main/protobufs
           cp ./tracking/steam.inf ./main/steam.inf
           cp ./tracking/hash.txt ./main/hash.txt
-          git checkout main
       - name: Create Commit
         run: |
-            cp main
+            cd main
             git config user.email "bot@samh.dev"
             git config user.name "Synchronise"
             git add -A 
