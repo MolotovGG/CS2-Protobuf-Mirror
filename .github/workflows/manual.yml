@@ -10,12 +10,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout Main
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           path: 'main'
           ref: "main"
       - name: Checkout Tracking
-        uses: actions/checkout@4.2.2
+        uses: actions/checkout@v5
         with: 
           path: "tracking"
           ref: "tracking"
@@ -49,7 +49,7 @@ jobs:
        webhook_path: ${{ secrets.WEBHOOK_PATH }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 3
       - name: send-webhook
