@@ -88,12 +88,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout Main
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           path: 'main'
           ref: "main"
       - name: Checkout Tracking
-        uses: actions/checkout@4.2.2
+        uses: actions/checkout@v5
         with: 
           path: "tracking"
           ref: "tracking"
