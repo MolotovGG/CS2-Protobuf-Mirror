@@ -88,12 +88,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout Main
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           path: 'main'
           ref: "main"
       - name: Checkout Tracking
-        uses: actions/checkout@4.2.2
+        uses: actions/checkout@v5
         with: 
           path: "tracking"
           ref: "tracking"
@@ -122,7 +122,7 @@ jobs:
        webhook_path: ${{ secrets.WEBHOOK_PATH }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 3
       - name: send-webhook
@@ -133,10 +133,10 @@ jobs:
           CS_VERSION="$(cat steam.inf | grep 'PatchVersion=' | sed 's/PatchVersion=//')"
           URL="https://discord.com/api/webhooks/${webhook_path}?wait=true"
           printf "null" | jq \
-          --arg "diff" "$DIFF"\
-          --arg "this_commit" "$THIS_COMMIT"\
-          --arg "tracked_commit" "$TRACKED_HASH_SHORT"\
-          --arg "cs_version" "$CS_VERSION" '. |
+            --arg "diff" "$DIFF"\
+            --arg "this_commit" "$THIS_COMMIT"\
+            --arg "tracked_commit" "$TRACKED_HASH_SHORT"\
+            --arg "cs_version" "$CS_VERSION" '. |
           {
             "content": null,
             "embeds": [{
